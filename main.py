@@ -23,12 +23,17 @@ def process_pdf():
     print(page_num)
     file = request.files['file']
     # submit an empty part without filename
+
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+
     if file.filename == '':
         # flash('No selected file')
         abort(404)
     if file:
         filename = re.sub(' ', '', file.filename)
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+
 
     pdfFileObj = open(os.path.join(UPLOAD_FOLDER, filename), 'rb')
     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
@@ -66,4 +71,4 @@ def nlp_process(text):
 if __name__ == "__main__":
     with app.app_context():
         port = os.getenv('PORT', '5000')
-        app.run(debug=True, host='0.0.0.0', port=int(port))
+        app.run(debug=False, host='0.0.0.0', port=int(port))
