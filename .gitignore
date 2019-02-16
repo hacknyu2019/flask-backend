@@ -1,4 +1,8 @@
 .idea
 venv/
+.vscode
+/pdf
+venv/
+.idea
 *.pyc
 __pycache__/
