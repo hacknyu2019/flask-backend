@@ -1,5 +1,6 @@
 import os
 import re
+import uuid
 import json
 from pprint import pprint
 import PyPDF2
@@ -17,31 +18,34 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-@app.route("/process_pdf", methods=['POST'])
-def process_pdf():
-    page_num = request.args['page']
-    print(page_num)
+@app.route("/upload", methods=['POST'])
+def upload():
     file = request.files['file']
-    # submit an empty part without filename
+
+    if not os.path.exists(UPLOAD_FOLDER):
+        os.makedirs(UPLOAD_FOLDER)
+
     if file.filename == '':
         # flash('No selected file')
         abort(404)
     if file:
-        filename = re.sub(' ', '', file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+        new_uuid = str(uuid.uuid4())
+        file.save(os.path.join(app.config['UPLOAD_FOLDER'], new_uuid + '.pdf'))
+        return json.dumps(new_uuid)
 
-    pdfFileObj = open(os.path.join(UPLOAD_FOLDER, filename), 'rb')
+
+@app.route("/process_pdf")
+def process_pdf():
+    page_num = request.args['page']
+    id = request.args['id']
+
+    pdfFileObj = open(os.path.join(UPLOAD_FOLDER, id + '.pdf'), 'rb')
     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
+    if pdfReader.isEncrypted:
+        pdfReader.decrypt('')
 
-    num_pages = pdfReader.numPages
-    count = 0
-    text_arr = []
-    # while count < num_pages:
     page = pdfReader.getPage(int(page_num))
-    # count += 1
     page_text = page.extractText()
-    # pprint(get_concepts(page_text))
-    # text_arr.append(page_text)
 
     news = nlp_process(page_text)
 
@@ -62,6 +66,8 @@ def nlp_process(text):
     pprint(news)
     return news
 
+
 if __name__ == "__main__":
-    port = os.getenv('PORT', '5000')
-    app.run(debug=True, host='0.0.0.0', port=int(port))
+    with app.app_context():
+        port = os.getenv('PORT', '5000')
+        app.run(debug=False, host='0.0.0.0', port=int(port))
