@@ -8,11 +8,14 @@ import PyPDF2
 from flask import Flask, jsonify, request, redirect, abort
 
 # from werkzeug.utils import secure_filename
+from flask_cors import CORS
+
 from news import get_news
 from watson import get_concepts
 
 UPLOAD_FOLDER = './pdf/'
 app = Flask(__name__)
+CORS(app)
 
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
