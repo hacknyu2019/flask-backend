@@ -62,6 +62,8 @@ def nlp_process(text):
     pprint(news)
     return news
 
+
 if __name__ == "__main__":
-    port = os.getenv('PORT', '5000')
-    app.run(debug=True, host='0.0.0.0', port=int(port))
+    with app.app_context():
+        port = os.getenv('PORT', '5000')
+        app.run(debug=True, host='0.0.0.0', port=int(port))

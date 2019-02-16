@@ -1,9 +1,10 @@
+import os
 import json
 
 from flask.json import jsonify
 from watson_developer_cloud import DiscoveryV1
 
-API_KEY = 'v4LQwIL3k1A60XifWU8yWFR2TxcqYn_gq1PAUDkT8e9n'
+API_KEY = os.environ.get('IBM_DISCOVERY_API_KEY')
 
 
 def get_news(query):
@@ -25,8 +26,8 @@ def get_news(query):
 
     qopts = {'query': query, 'count': 5, 'return': 'title, text, url, sentiments'}
     results = discovery.query(count=5, return_fields=['title, text, url, sentiments'],
-                               environment_id=news_environment_id,
-                               collection_id='news-en', query=query).get_result()
+                              environment_id=news_environment_id,
+                              collection_id='news-en', query=query).get_result()
     # print(json.dumps(my_query, indent=2))
     return jsonify(results)
 
