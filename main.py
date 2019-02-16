@@ -34,7 +34,7 @@ def upload():
     if file:
         new_uuid = str(uuid.uuid4())
         file.save(os.path.join(app.config['UPLOAD_FOLDER'], new_uuid + '.pdf'))
-        return json.dumps(new_uuid)
+        return jsonify({'id': new_uuid})
 
 
 @app.route("/process_pdf")
