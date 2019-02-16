@@ -16,12 +16,12 @@ def get_concepts(text_input):
     try:
         response = natural_language_understanding.analyze(
             text=text_input,
-            features=Features(concepts=ConceptsOptions(),
-                              # entities=EntitiesOptions(),
+            features=Features(concepts=ConceptsOptions(limit=5),
+                              entities=EntitiesOptions(),
                               # keywords=KeywordsOptions(),
                               # categories=CategoriesOptions()
                               )).get_result()
-        return response['concepts']
+        return response['concepts'], response['entities']
     except Exception as e:
         print("Could not get concepts for this page", text_input)
         return None
