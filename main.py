@@ -1,12 +1,13 @@
 import os
 import re
 import json
-import pprint
+from pprint import pprint
 import PyPDF2
 
 from flask import Flask, jsonify, request, redirect, abort
 
 # from werkzeug.utils import secure_filename
+from watson import get_concepts
 
 UPLOAD_FOLDER = './pdf/'
 app = Flask(__name__)
@@ -15,13 +16,8 @@ app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
-@app.route("/")
-def hello_word():
-    return "Hello World!"
-
-
-@app.route("/upload", methods=['POST'])
-def upload_pdf():
+@app.route("/process_pdf", methods=['POST'])
+def process_pdf():
     file = request.files['file']
     # submit an empty part without filename
     if file.filename == '':
@@ -35,16 +31,26 @@ def upload_pdf():
     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
 
     num_pages = pdfReader.numPages
-    print(num_pages)
     count = 0
     text_arr = []
     while count < num_pages:
         page = pdfReader.getPage(count)
         count += 1
         page_text = page.extractText()
+        pprint(get_concepts(page_text))
         text_arr.append(page_text)
 
+    nlp_process(text_arr)
+
     return json.dumps(text_arr)
+
+
+def nlp_process(text_arr):
+    concepts = []
+    for text in text_arr:
+        concepts = get_concepts(text)
+        pprint(concepts)
+        print('_______________________')
 
 
 if __name__ == "__main__":
