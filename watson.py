@@ -5,7 +5,7 @@ from watson_developer_cloud import NaturalLanguageUnderstandingV1
 from watson_developer_cloud.natural_language_understanding_v1 import Features, \
     EntitiesOptions, KeywordsOptions, ConceptsOptions, CategoriesOptions
 
-API_KEY = os.environ.get('API_KEY')
+API_KEY = os.environ.get('IBM_API_KEY')
 
 
 def get_concepts(text_input):
