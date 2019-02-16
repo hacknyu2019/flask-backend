@@ -13,7 +13,6 @@ from watson import get_concepts
 UPLOAD_FOLDER = './pdf/'
 app = Flask(__name__)
 
-
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 
@@ -61,6 +60,7 @@ def nlp_process(text):
     news = get_news(query)
     pprint(news)
     return news
+
 
 if __name__ == "__main__":
     port = os.getenv('PORT', '5000')

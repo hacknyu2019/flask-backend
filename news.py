@@ -1,5 +1,6 @@
 import json
 
+from flask import app
 from flask.json import jsonify
 from watson_developer_cloud import DiscoveryV1
 
@@ -32,4 +33,4 @@ def get_news(query):
 
 
 if __name__ == '__main__':
-    print(get_news("test sentence with computer networks"))
+ print(get_news("singapore"))
