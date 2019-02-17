@@ -32,6 +32,7 @@ pdf_cache = {}
 
 text_cache = {}
 
+
 @app.route("/upload", methods=['POST'])
 def upload():
     file = request.files['file']
@@ -75,8 +76,10 @@ def process_pdf():
 
     concepts, entities = get_concepts(page_text)
     print('Got concepts')
-    news = pool.apply_async(get_news_summaries, args=(concepts,)).get()
-    definitions = pool.apply_async(get_definitions, args=(concepts,)).get()
+    # news = pool.apply_async(get_news_summaries, args=(concepts,)).get()
+    # definitions = pool.apply_async(get_definitions, args=(concepts,)).get()
+    news = get_news_summaries(concepts)
+    definitions = get_definitions(concepts)
 
     final_resp = {'definitions': definitions, 'news': news}
 
