@@ -4,11 +4,13 @@ import json
 import requests
 from pprint import pprint
 import PyPDF2
+import requests
 
 from flask import Flask, jsonify, request, abort
 
 from flask_cors import CORS
 
+from agolo import get_agolo_summary
 from news import get_news
 from watson import get_concepts
 
@@ -82,18 +84,24 @@ def concepts_process(text):
 
     return all_concept_info
 
+
 def nlp_process(text):
     concepts, entities = get_concepts(text)
-    pprint(concepts)
-    pprint(entities)
+    # pprint(concepts)
+    # pprint(entities)
     print('_______________________')
-    texts = [concept['text'] for concept in entities]
-
+    texts = [concept['text'] for concept in concepts]
+    # print(texts)
     query = " ".join(texts)
-    news = get_news(query)
-    pprint(news)
+    news = get_news(query)['results']
 
-    return news
+    # pprint(news)
+    news_summaries = []
+    for news_article in news:
+        news_article['title'], news_article['text'] = get_agolo_summary(news_article['url'])
+        news_summaries.append(news_article)
+
+    return jsonify(news_summaries)
 
 
 if __name__ == "__main__":

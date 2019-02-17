@@ -28,8 +28,6 @@ def get_news(query):
     results = discovery.query(count=5, return_fields=['title, text, url, sentiments'],
                               environment_id=news_environment_id,
                               collection_id='news-en', query=query).get_result()
-    # print(json.dumps(my_query, indent=2))
-    # return jsonify(results)
     return results
 
 
