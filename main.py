@@ -52,8 +52,8 @@ def process_pdf():
 
     print(pdf_cache.get(str(id) + str(page_num)))
 
-    if pdf_cache.__contains__(str(id) + str(page_num)):
-        return pdf_cache.get(str(id) + str(page_num))
+    # if pdf_cache.__contains__(str(id) + str(page_num)):
+    #     return pdf_cache.get(str(id) + str(page_num))
 
     pdfFileObj = open(os.path.join(UPLOAD_FOLDER, id + '.pdf'), 'rb')
     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
@@ -67,7 +67,7 @@ def process_pdf():
         print("Found in page cache")
         return text_cache.get(page_text)
 
-    pool = multiprocessing.Pool(processes=4)
+    # pool = multiprocessing.Pool(processes=4)
 
     concepts, entities = get_concepts(page_text)
     print('Got concepts')
@@ -78,7 +78,7 @@ def process_pdf():
 
     final_resp = {'definitions': definitions, 'news': news}
 
-    pdf_cache[str(id) + str(page_num)] = jsonify(final_resp)
+    # pdf_cache[str(id) + str(page_num)] = jsonify(final_resp)
     text_cache[page_text] = jsonify(final_resp)
     return jsonify(final_resp)
 
