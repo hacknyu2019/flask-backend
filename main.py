@@ -1,13 +1,12 @@
 import os
-import re
 import uuid
 import json
+import requests
 from pprint import pprint
 import PyPDF2
 
-from flask import Flask, jsonify, request, redirect, abort
+from flask import Flask, jsonify, request, abort
 
-# from werkzeug.utils import secure_filename
 from flask_cors import CORS
 
 from news import get_news
@@ -52,21 +51,48 @@ def process_pdf():
 
     news = nlp_process(page_text)
 
-    return news
+    definitions = concepts_process(page_text)
 
+    final_resp = {'definitions': definitions, 'news': news}
+
+    return jsonify(final_resp)
+
+
+def concepts_process(text):
+    concepts, entities = get_concepts(text)
+    texts = [concept['text'] for concept in concepts]
+    links = [concept['dbpedia_resource'] for concept in concepts]
+    all_concept_info = []
+
+    definition_count = 0
+    print(len(texts))
+    if len(texts) > 5 and definition_count < 5:
+        definition_count += 1
+        for word in range(len(texts)):
+            r = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/' + texts[word])
+            content = json.loads(r.text)
+            if 'extract' in content:
+                all_concept_info.append({'title': texts[word], 'url': links[word], 'text': content['extract']})
+    if len(texts) <= 5:
+        for word in range(len(texts)):
+            r = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/' + texts[word])
+            content = json.loads(r.text)
+            if 'extract' in content:
+                all_concept_info.append({'title': texts[word], 'url': links[word], 'text': content['extract']})
+
+    return all_concept_info
 
 def nlp_process(text):
-    concepts = []
-    # for text in text_arr:
     concepts, entities = get_concepts(text)
     pprint(concepts)
     pprint(entities)
     print('_______________________')
     texts = [concept['text'] for concept in entities]
-    # print(texts)
+
     query = " ".join(texts)
     news = get_news(query)
     pprint(news)
+
     return news
 
 
