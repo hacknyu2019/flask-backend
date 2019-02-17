@@ -101,7 +101,7 @@ def nlp_process(text):
         news_article['title'], news_article['text'] = get_agolo_summary(news_article['url'])
         news_summaries.append(news_article)
 
-    return jsonify(news_summaries)
+    return news_summaries
 
 
 if __name__ == "__main__":
