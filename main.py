@@ -68,6 +68,7 @@ def process_pdf():
     page_text = page.extractText()
 
     if text_cache.__contains__(page_text):
+        print("Found in page cache")
         return text_cache.get(page_text)
 
     pool = multiprocessing.Pool(processes=4)
