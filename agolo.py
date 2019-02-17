@@ -3,10 +3,13 @@ from pprint import pprint
 
 import requests
 
+JWT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNT' \
+      'E2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
+
 HEADERS = {
     'Accept': 'application/json',
     'Content-type': 'application/json',
-    # 'Authorization': 'Bearer ' + JWT
+    'Authorization': 'Bearer ' + JWT
 }
 
 
@@ -19,12 +22,13 @@ def get_summarization_request_payload(articles):
 
 def get_agolo_summary(article_url):
     articles = [{'url': article_url}]
-    response = requests.post('https://node-sum.staging.agolo.com/summarization',
+    response = requests.post('http://summarization-api.staging.agolo.com/summarization-api-java-0.2.0/v0.2/summarize',
                              data=json.dumps(get_summarization_request_payload(articles)),
                              headers=HEADERS, verify=False)
-    pprint(response.text)
+    # pprint(response.text)
     if response.text is not None and response.text != '':
-        return json.loads(response.text)['title'], json.loads(response.text)['sentences']
+        return json.loads(response.text)['title'],\
+               json.loads(response.text)['summary'][0]['sentences'],
 
     return '', []
 

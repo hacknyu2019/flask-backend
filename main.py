@@ -1,10 +1,14 @@
 import os
+import threading
 import uuid
 import json
+from multiprocessing.pool import ThreadPool
+
 import requests
 from pprint import pprint
 import PyPDF2
 import requests
+import urllib3
 
 from flask import Flask, jsonify, request, abort
 
@@ -13,6 +17,8 @@ from flask_cors import CORS
 from agolo import get_agolo_summary
 from news import get_news
 from watson import get_concepts
+
+urllib3.disable_warnings()
 
 UPLOAD_FOLDER = './pdf/'
 app = Flask(__name__)
@@ -52,22 +58,24 @@ def process_pdf():
     page_text = page.extractText()
 
     pool = multiprocessing.Pool(processes=4)
-    news = pool.apply_async(nlp_process, args=(page_text,)).get()
-    definitions = pool.apply_async(concepts_process, args=(page_text,)).get()
+
+    concepts, entities = get_concepts(page_text)
+    print('Got concepts')
+    news = pool.apply_async(get_news_summaries, args=(concepts,)).get()
+    definitions = pool.apply_async(get_definitions, args=(concepts,)).get()
 
     final_resp = {'definitions': definitions, 'news': news}
 
     return jsonify(final_resp)
 
 
-def concepts_process(text):
-    concepts, entities = get_concepts(text)
+def get_definitions(concepts):
     texts = [concept['text'] for concept in concepts]
     links = [concept['dbpedia_resource'] for concept in concepts]
     all_concept_info = []
 
     definition_count = 0
-    print(len(texts))
+    # print(len(texts))
     if len(texts) > 5 and definition_count < 5:
         definition_count += 1
         for word in range(len(texts)):
@@ -85,21 +93,26 @@ def concepts_process(text):
     return all_concept_info
 
 
-def nlp_process(text):
-    concepts, entities = get_concepts(text)
+def get_news_summaries(concepts):
+    # concepts, entities = get_concepts(text)
     # pprint(concepts)
-    # pprint(entities)
-    print('_______________________')
     texts = [concept['text'] for concept in concepts]
     # print(texts)
     query = " ".join(texts)
     news = get_news(query)['results']
 
-    # pprint(news)
+    pool = ThreadPool(10)
+
+    print("Got news, summarizing")
     news_summaries = []
     for news_article in news:
+        async_summary = pool.apply_async(get_agolo_summary(article_url=news_article['url']))
         news_article['title'], news_article['text'] = get_agolo_summary(news_article['url'])
         news_summaries.append(news_article)
+
+    print("Got summaries")
+
+    print('----------------------')
 
     return news_summaries
 
