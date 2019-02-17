@@ -27,6 +27,8 @@ import multiprocessing
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
+pdf_cache = {}
+
 
 @app.route("/upload", methods=['POST'])
 def upload():
@@ -49,6 +51,9 @@ def process_pdf():
     page_num = request.args['page']
     id = request.args['id']
 
+    if pdf_cache.__contains__(str(id) + str(page_num)):
+        return pdf_cache.get(str(id) + str(page_num))
+
     pdfFileObj = open(os.path.join(UPLOAD_FOLDER, id + '.pdf'), 'rb')
     pdfReader = PyPDF2.PdfFileReader(pdfFileObj)
     if pdfReader.isEncrypted:
@@ -65,6 +70,8 @@ def process_pdf():
     definitions = pool.apply_async(get_definitions, args=(concepts,)).get()
 
     final_resp = {'definitions': definitions, 'news': news}
+
+    pdf_cache[str(id) + str(page_num)] = jsonify(final_resp)
 
     return jsonify(final_resp)
 

@@ -7,8 +7,13 @@ from watson_developer_cloud.natural_language_understanding_v1 import Features, \
 
 API_KEY = os.environ.get('IBM_API_KEY')
 
+concepts_cache = {}
+
 
 def get_concepts(text_input):
+    if concepts_cache.__contains__(text_input):
+        return concepts_cache.get(text_input)
+
     natural_language_understanding = NaturalLanguageUnderstandingV1(
         version="2017-02-27",
         iam_apikey=API_KEY)
@@ -21,6 +26,7 @@ def get_concepts(text_input):
                               # keywords=KeywordsOptions(),
                               # categories=CategoriesOptions()
                               )).get_result()
+        concepts_cache[text_input] = response['concepts'], response['entities']
         return response['concepts'], response['entities']
     except Exception as e:
         print("Could not get concepts for this page", text_input)

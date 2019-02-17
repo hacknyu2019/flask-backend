@@ -6,8 +6,14 @@ from watson_developer_cloud import DiscoveryV1
 
 API_KEY = os.environ.get('IBM_DISCOVERY_API_KEY')
 
+news_cache = {}
+
 
 def get_news(query):
+    if news_cache.__contains__(query):
+        print("found news in cache")
+        return news_cache.get(query)
+
     discovery = DiscoveryV1(
         iam_apikey=API_KEY,
         version='2017-08-01'
@@ -27,6 +33,9 @@ def get_news(query):
     results = discovery.query(count=3, return_fields=['title, text, url, sentiments'],
                               environment_id=news_environment_id,
                               collection_id='news-en', query=query).get_result()
+
+    news_cache[query] = str(results)
+
     return results
 
 
