@@ -17,7 +17,7 @@ from watson import get_concepts
 UPLOAD_FOLDER = './pdf/'
 app = Flask(__name__)
 CORS(app)
-
+import multiprocessing
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -51,9 +51,9 @@ def process_pdf():
     page = pdfReader.getPage(int(page_num))
     page_text = page.extractText()
 
-    news = nlp_process(page_text)
-
-    definitions = concepts_process(page_text)
+    pool = multiprocessing.Pool(processes=4)
+    news = pool.apply_async(nlp_process, args=(page_text,)).get()
+    definitions = pool.apply_async(concepts_process, args=(page_text,)).get()
 
     final_resp = {'definitions': definitions, 'news': news}
 
