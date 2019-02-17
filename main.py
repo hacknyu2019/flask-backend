@@ -28,7 +28,7 @@ import multiprocessing
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
-pdf_cache = shelve.open('pdf_cache')
+pdf_cache = {}
 
 
 @app.route("/upload", methods=['POST'])
@@ -50,12 +50,9 @@ def upload():
 
 @app.route("/process_pdf")
 def process_pdf():
-    global pdf_cache
-    pdf_cache = shelve.open('pdf_cache')
     page_num = request.args['page']
     id = request.args['id']
 
-    print(str(id) + str(page_num))
     print(pdf_cache.get(str(id) + str(page_num)))
 
     if pdf_cache.__contains__(str(id) + str(page_num)):
@@ -79,7 +76,6 @@ def process_pdf():
     final_resp = {'definitions': definitions, 'news': news}
 
     pdf_cache[str(id) + str(page_num)] = jsonify(final_resp)
-    pdf_cache.close()
 
     return jsonify(final_resp)
 
