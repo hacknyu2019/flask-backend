@@ -1,15 +1,11 @@
 import os
-import shelve
-import threading
 import uuid
 import json
-from multiprocessing.pool import ThreadPool
-
-import requests
-from pprint import pprint
 import PyPDF2
 import requests
 import urllib3
+import multiprocessing
+from spacy.lang.en import English
 
 from flask import Flask, jsonify, request, abort
 
@@ -24,7 +20,6 @@ urllib3.disable_warnings()
 UPLOAD_FOLDER = './pdf/'
 app = Flask(__name__)
 CORS(app)
-import multiprocessing
 
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -86,33 +81,33 @@ def get_definitions(concepts):
     all_concept_info = []
 
     definition_count = 0
-    # print(len(texts))
     if len(texts) > 5 and definition_count < 5:
         definition_count += 1
         for word in range(len(texts)):
             r = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/' + texts[word])
             content = json.loads(r.text)
+            final_paragraph = get_3_sentences(content['extract'])
+
             if 'extract' in content:
-                all_concept_info.append({'title': texts[word], 'url': links[word], 'text': content['extract']})
+                all_concept_info.append({'title': texts[word], 'url': links[word], 'text': final_paragraph})
     if len(texts) <= 5:
         for word in range(len(texts)):
             r = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/' + texts[word])
             content = json.loads(r.text)
+            final_paragraph = get_3_sentences(content['extract'])
+
             if 'extract' in content:
-                all_concept_info.append({'title': texts[word], 'url': links[word], 'text': content['extract']})
+                all_concept_info.append({'title': texts[word], 'url': links[word], 'text': final_paragraph})
 
     return all_concept_info
 
 
 def get_news_summaries(concepts):
-    # concepts, entities = get_concepts(text)
-    # pprint(concepts)
     texts = [concept['text'] for concept in concepts]
-    # print(texts)
     query = " ".join(texts)
     news = get_news(query)['results']
 
-    print("Got news, summarizing")
+    print("Got news, summarizing...")
     news_summaries = []
     for news_article in news:
         news_article['title'], news_article['text'] = get_agolo_summary(news_article['url'])
@@ -124,6 +119,23 @@ def get_news_summaries(concepts):
     print('----------------------')
 
     return news_summaries
+
+
+def get_3_sentences(paragraph):
+    nlp = English()
+    nlp.add_pipe(nlp.create_pipe('sentencizer'))
+
+    definition_extract = nlp(paragraph)
+    sentences = [sent.string.strip() for sent in definition_extract.sents]
+    paragraph_sentence_count = len(sentences)
+
+    if paragraph_sentence_count > 3:
+        sentences_output = sentences[:3]
+        final_paragraph = ' '.join(sentences_output)
+    else:
+        final_paragraph = ' '.join(sentences)
+
+    return final_paragraph
 
 
 if __name__ == "__main__":
