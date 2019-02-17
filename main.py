@@ -65,13 +65,20 @@ def concepts_process(text):
     all_concept_info = []
 
     definition_count = 0
-    if definition_count < 5:
+    print(len(texts))
+    if len(texts) > 5 and definition_count < 5:
         definition_count += 1
         for word in range(len(texts)):
             r = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/' + texts[word])
             content = json.loads(r.text)
             if 'extract' in content:
-                all_concept_info.append({'text': texts[word], 'url': links[word], 'description': content['extract']})
+                all_concept_info.append({'title': texts[word], 'url': links[word], 'text': content['extract']})
+    if len(texts) <= 5:
+        for word in range(len(texts)):
+            r = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/' + texts[word])
+            content = json.loads(r.text)
+            if 'extract' in content:
+                all_concept_info.append({'title': texts[word], 'url': links[word], 'text': content['extract']})
 
     return all_concept_info
 
