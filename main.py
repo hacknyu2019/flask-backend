@@ -127,6 +127,5 @@ def get_news_summaries(concepts):
 
 
 if __name__ == "__main__":
-    with app.app_context():
-        port = os.getenv('PORT', '5000')
-        app.run(debug=False, host='0.0.0.0', port=int(port))
+    port = os.getenv('PORT', '5000')
+    app.run(debug=False, host='0.0.0.0', port=int(port))
