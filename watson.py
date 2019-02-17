@@ -11,10 +11,6 @@ concepts_cache = {}
 
 
 def get_concepts(text_input):
-    global concepts_cache
-
-    if concepts_cache.__contains__(text_input):
-        return concepts_cache.get(text_input)
 
     natural_language_understanding = NaturalLanguageUnderstandingV1(
         version="2017-02-27",
@@ -28,7 +24,6 @@ def get_concepts(text_input):
                               # keywords=KeywordsOptions(),
                               # categories=CategoriesOptions()
                               )).get_result()
-        concepts_cache[text_input] = response['concepts'], response['entities']
         return response['concepts'], response['entities']
     except Exception as e:
         print("Could not get concepts for this page", text_input)
