@@ -30,6 +30,7 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 pdf_cache = {}
 
+text_cache = {}
 
 @app.route("/upload", methods=['POST'])
 def upload():
@@ -66,6 +67,9 @@ def process_pdf():
     page = pdfReader.getPage(int(page_num))
     page_text = page.extractText()
 
+    if text_cache.__contains__(page_text):
+        return text_cache.get(page_text)
+
     pool = multiprocessing.Pool(processes=4)
 
     concepts, entities = get_concepts(page_text)
@@ -76,7 +80,7 @@ def process_pdf():
     final_resp = {'definitions': definitions, 'news': news}
 
     pdf_cache[str(id) + str(page_num)] = jsonify(final_resp)
-
+    text_cache[page_text] = jsonify(final_resp)
     return jsonify(final_resp)
 
 
