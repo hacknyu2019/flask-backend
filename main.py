@@ -64,11 +64,14 @@ def concepts_process(text):
     links = [concept['dbpedia_resource'] for concept in concepts]
     all_concept_info = []
 
-    for word in range(len(texts)):
-        r = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/' + texts[word])
-        content = json.loads(r.text)
-        if 'extract' in content:
-            all_concept_info.append({'text': texts[word], 'url': links[word], 'description': content['extract']})
+    definition_count = 0
+    if definition_count < 5:
+        definition_count += 1
+        for word in range(len(texts)):
+            r = requests.get('https://en.wikipedia.org/api/rest_v1/page/summary/' + texts[word])
+            content = json.loads(r.text)
+            if 'extract' in content:
+                all_concept_info.append({'text': texts[word], 'url': links[word], 'description': content['extract']})
 
     return all_concept_info
 
