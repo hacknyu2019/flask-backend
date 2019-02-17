@@ -109,12 +109,9 @@ def get_news_summaries(concepts):
     query = " ".join(texts)
     news = get_news(query)['results']
 
-    pool = ThreadPool(10)
-
     print("Got news, summarizing")
     news_summaries = []
     for news_article in news:
-        async_summary = pool.apply_async(get_agolo_summary(article_url=news_article['url']))
         news_article['title'], news_article['text'] = get_agolo_summary(news_article['url'])
         news_summaries.append(news_article)
 
