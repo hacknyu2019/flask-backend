@@ -23,9 +23,11 @@ def get_agolo_summary(article_url):
                              data=json.dumps(get_summarization_request_payload(articles)),
                              headers=HEADERS, verify=False)
     pprint(response.text)
-    return json.loads(response.text)['title'], json.loads(response.text)['sentences']
+    if response.text is not None and response.text != '':
+        return json.loads(response.text)['title'], json.loads(response.text)['sentences']
 
+    return '', []
 
-if __name__ == '__main__':
-    print(get_agolo_summary(
-        "http://community.energycentral.com/c/ec/green-new-deal-can%E2%80%99t-be-concocted-out-hot-air"))
+# if __name__ == '__main__':
+#     print(get_agolo_summary(
+#         "http://community.energycentral.com/c/ec/green-new-deal-can%E2%80%99t-be-concocted-out-hot-air"))
