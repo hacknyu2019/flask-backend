@@ -113,7 +113,8 @@ def get_news_summaries(concepts):
     news_summaries = []
     for news_article in news:
         news_article['title'], news_article['text'] = get_agolo_summary(news_article['url'])
-        news_summaries.append(news_article)
+        if news_article['title']:
+            news_summaries.append(news_article)
 
     print("Got summaries")
 

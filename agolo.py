@@ -31,8 +31,9 @@ def get_agolo_summary(article_url):
     response = requests.post('http://summarization-api.staging.agolo.com/summarization-api-java-0.2.0/v0.2/summarize',
                              data=json.dumps(get_summarization_request_payload(articles)),
                              headers=HEADERS, verify=False)
-    # pprint(response.text)
-    if response.text is not None and response.text != '':
+    pprint(json.loads(response.text)['summary'])
+    if response.text is not None and response.text != '' \
+            and json.loads(response.text)['summary']:
         agolo_cache[article_url] = json.loads(response.text)['title'], \
                                    json.loads(response.text)['summary'][0]['sentences']
         return json.loads(response.text)['title'], \

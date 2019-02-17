@@ -30,7 +30,7 @@ def get_news(query):
     # print(json.dumps(collections, indent=2))
     news_collections = [x for x in collections['collections']]
 
-    results = discovery.query(count=3, return_fields=['title, text, url, sentiments'],
+    results = discovery.query(count=5, return_fields=['title, text, url, sentiments'],
                               environment_id=news_environment_id,
                               collection_id='news-en', query=query).get_result()
 
