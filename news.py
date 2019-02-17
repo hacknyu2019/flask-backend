@@ -29,7 +29,8 @@ def get_news(query):
                               environment_id=news_environment_id,
                               collection_id='news-en', query=query).get_result()
     # print(json.dumps(my_query, indent=2))
-    return jsonify(results)
+    # return jsonify(results)
+    return results
 
 
 if __name__ == '__main__':
