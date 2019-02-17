@@ -23,6 +23,7 @@ def get_summarization_request_payload(articles):
 
 
 def get_agolo_summary(article_url):
+    global agolo_cache
     if agolo_cache.__contains__(article_url):
         print("Found summary in cache")
         return agolo_cache.get(article_url)

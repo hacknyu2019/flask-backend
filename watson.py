@@ -11,6 +11,8 @@ concepts_cache = {}
 
 
 def get_concepts(text_input):
+    global concepts_cache
+
     if concepts_cache.__contains__(text_input):
         return concepts_cache.get(text_input)
 

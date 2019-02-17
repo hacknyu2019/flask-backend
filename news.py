@@ -10,6 +10,7 @@ news_cache = {}
 
 
 def get_news(query):
+    global news_cache
     if news_cache.__contains__(query):
         print("found news in cache")
         return news_cache.get(query)
