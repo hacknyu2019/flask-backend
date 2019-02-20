@@ -30,7 +30,7 @@ def get_agolo_summary(article_url):
         return agolo_cache.get(article_url)
 
     articles = [{'url': article_url}]
-    response = requests.post('http://summarization-api.staging.agolo.com/summarization-api-java-0.2.0/v0.2/summarize',
+    response = requests.post('http://summarization-api.prod.agolo.com/summarization-api-java-0.2.0/v0.2/summarize',
                              data=json.dumps(get_summarization_request_payload(articles)),
                              headers=HEADERS, verify=False)
     pprint(json.loads(response.text)['summary'])
